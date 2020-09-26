@@ -20,6 +20,8 @@
     "yup": "^0.29.3"
   },
   "scripts": {
+    // After the build, purgecss will clean the css.
+    "postbuild": "purgecss --css build/static/css/*.css --content build/index.html build/static/js/*.js --output build/static/css",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

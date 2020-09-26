@@ -6,7 +6,8 @@ import Input from '../Input/Input';
 import Link from '../Link/Link';
 import ButtonGroup from '../Button/ButtonGroup';
 import axios from "axios";
-import {SERVER_BASE_URL} from "./service";
+import {setIsLoggedIn, updateProfile} from "../../redux/actions/authActions";
+import {useDispatch} from "react-redux";
 
 function Login() {
 
@@ -17,13 +18,31 @@ function Login() {
     }
   }
 
-  const trySignIn = (username, password) => {
-    axios.post(`${SERVER_BASE_URL}/auth/signin`, {username, password}, axiosConfig)
-        .then(response => console.log(response.data))
+  const dispatch = useDispatch();
+
+  const trySignUp = (username, password, role) => {
+    console.log('hiiiii')
+    axios.post(
+        `http://localhost:8080/auth/signup`,
+        {
+          username,
+          password,
+          role
+        },
+        axiosConfig)
+        .then(response => console.log(response))
         .catch(error => console.log(error));
   }
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const trySignIn = (username, password) => {
+    axios.post(`http://localhost:8080/auth/signin`, {username, password}, axiosConfig)
+        .then(response => {
+          dispatch(setIsLoggedIn(true));
+          dispatch(updateProfile(response.data));
+        })
+        .catch(error => console.log(error));
+  }
+
   const [panel, setPanel] = useState('LOGIN');
   const switchPanel = () =>
     panel === 'LOGIN' ? setPanel('SIGNUP') : setPanel('LOGIN');
@@ -31,6 +50,7 @@ function Login() {
     initialValues: {
       username: '',
       password: '',
+      role: '',
     },
     validationSchema: Yup.object({
       username: Yup.string()
@@ -40,7 +60,9 @@ function Login() {
         .required('Required'),
     }),
     validateOnChange: true,
-    onSubmit: values => trySignIn(values.username, values.password),
+    onSubmit: values => {
+      panel === 'LOGIN' ? trySignIn(values.username, values.password) : trySignUp(values.username, values.password, [values.role]);
+    },
   });
   return (
     <React.Fragment>
@@ -67,6 +89,17 @@ function Login() {
                 : null
             }
           />
+          {(panel !== 'LOGIN') &&
+          <select
+              className="p-4 md:p-6 bg-gray-200 text-gray-700 mb-3 w-full rounded-sm"
+              value={formik.values.role}
+              onChange={formik.handleChange}
+              name="role"
+          >
+            <option value="privateUser1"> User type 1 </option>
+            <option value="privateUser2"> User type 2 </option>
+            <option value="privateUser3"> User type 3 </option>
+          </select>}
           <Input
             label="Password"
             type="password"
@@ -82,11 +115,7 @@ function Login() {
           />
           <div className="flex mb-0">
             <ButtonGroup>
-              <Button type="reset" outlined onClick={() => formik.resetForm()}>
-                Clear
-              </Button>
               <Button
-                className="md:ml-2"
                 disabled={!formik.isValid}
                 type="submit"
               >

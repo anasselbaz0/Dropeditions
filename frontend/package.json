@@ -7,9 +7,13 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "@u-wave/react-youtube": "^0.7.1",
+    "axios": "^0.20.0",
+    "clsx": "^1.1.1",
+    "formik": "^2.1.5",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "yup": "^0.29.3"
   },
   "scripts": {
     "start": "react-scripts start",
